@@ -33,17 +33,27 @@ async def models(ctx):
         The OpenAI API currently has {len(openai.Model.list().data)} available model from the GPT-3, Codex and Content Filter family. They each have their own capabilities and strengths. I primarily use models from the GPT-3 family for natural language processing which allows me to answer your questions. The main GPT-3 models are: \n \t1. Davinci - <https://beta.openai.com/docs/models/davinci> \n \t2. Curie - <https://beta.openai.com/docs/models/curie> \n \t3. Babbage - <https://beta.openai.com/docs/models/babbage> \n \t4. Ada - <https://beta.openai.com/docs/models/ada> \n To learn more, visit https://beta.openai.com/docs/models/overview. \
         ")
 
-@bot.command()
-async def completion(ctx, arg):
+@bot.command(name="ask")
+async def completion(ctx, *, arg):
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=arg,
         max_tokens=3900,
         temperature=1
         )
-    print(response)
+    print("Completion:", response, "\n")
     await ctx.channel.send(response.choices[0].text)
 
+@bot.command(name="fix")
+async def edit(ctx, *, arg):
+    response = openai.Edit.create(
+        model="text-davinci-edit-001",
+        input=input_in,
+        instruction="Please fix the grammer and spelling mistakes.",
+        temperature=0
+        )
+    print("Edit:", response, "\n")
+    await ctx.channel.send(response.choices[0].text)
 
 # exe
 bot.run(os.getenv('BOT_TOKEN'))
