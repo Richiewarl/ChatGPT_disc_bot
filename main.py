@@ -35,25 +35,60 @@ async def models(ctx):
 
 @bot.command(name="ask")
 async def completion(ctx, *, arg, temp=1):
+    # TODO: allow user to temp appropriately
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=arg,
         max_tokens=3900,
         temperature=temp
         )
+
     print("Completion:", response, "\n")
     await ctx.channel.send(response.choices[0].text)
 
 @bot.command(name="fix")
+# TODO: allow user to temp appropriately
 async def edit(ctx, *, arg, temp=0):
+    print(ctx)
     response = openai.Edit.create(
         model="text-davinci-edit-001",
         input=arg,
         instruction="Please fix the grammer and spelling mistakes.",
         temperature=temp
         )
+
     print("Edit:", response, "\n")
     await ctx.channel.send(response.choices[0].text)
+
+@bot.command(name="img")
+async def images_generation(ctx, *, arg):
+    # TODO: Allow user to select number of imges and resolution. multiple imgs support is there, just selection from user.
+    resolution = ["256x256", "512x512", "1024x1024"]  # available res
+    response = openai.Image.create(
+        prompt=arg,
+        n=2,
+        size="1024x1024",
+        response_format="url"
+        )
+    urls = response.data
+    print("images_generation:", response, "\n")
+
+    # create embed
+    icons = [":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"]
+    embed = discord.Embed(
+        title="Generated Pictures" if len(urls) > 1 else "Generated Picture",
+        description=arg,
+        colour=discord.Color.purple()
+        )
+    embed.set_author(
+        name="OpenAI",
+        url="https://beta.openai.com/docs/api-reference/images/create",
+        icon_url="https://pbs.twimg.com/profile_images/1603113436757389313/wpYDqrIf_400x400.jpg")
+    embed.set_thumbnail(url=urls[0].url)
+    for i in range(len(urls)):
+        embed.add_field(name=icons[i] + " :frame_photo:", value="[Click Here](" + urls[i].url + ")")
+    
+    await ctx.channel.send(embed=embed)
 
 # exe
 bot.run(os.getenv('BOT_TOKEN'))
