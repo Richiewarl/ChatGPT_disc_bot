@@ -34,23 +34,23 @@ async def models(ctx):
         ")
 
 @bot.command(name="ask")
-async def completion(ctx, *, arg):
+async def completion(ctx, *, arg, temp=1):
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=arg,
         max_tokens=3900,
-        temperature=1
+        temperature=temp
         )
     print("Completion:", response, "\n")
     await ctx.channel.send(response.choices[0].text)
 
 @bot.command(name="fix")
-async def edit(ctx, *, arg):
+async def edit(ctx, *, arg, temp=0):
     response = openai.Edit.create(
         model="text-davinci-edit-001",
-        input=input_in,
+        input=arg,
         instruction="Please fix the grammer and spelling mistakes.",
-        temperature=0
+        temperature=temp
         )
     print("Edit:", response, "\n")
     await ctx.channel.send(response.choices[0].text)
